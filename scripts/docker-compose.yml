@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  ac-database:
+    image: mysql:8.4
+    container_name: azerothcore-database
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-acore123}
+      MYSQL_DATABASE: acore_auth
+    ports:
+      - "${DB_PORT:-3307}:3306"  # Your port fix to avoid conflicts
+    volumes:
+      - acore_database:/var/lib/mysql  # Your named volume fix
+    networks:
+      - acore-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ac-db-import:
+    image: acore/ac-wotlk-db-import:master
+    container_name: azerothcore-db-import
+    depends_on:
+      ac-database:
+        condition: service_healthy
+    environment:
+      - DOCKER_USER=root  # Your permission fix
+      - AC_LOGIN_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_auth
+      - AC_CHARACTER_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_characters
+      - AC_WORLD_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_world
+      - AC_PLAYERBOTS_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_playerbots
+    volumes:
+      - acore_etc:/azerothcore/env/dist/etc      # Your named volume fix
+      - acore_logs:/azerothcore/env/dist/logs    # Your named volume fix
+    networks:
+      - acore-network
+
+  ac-worldserver:
+    image: acore/ac-wotlk-worldserver:master
+    container_name: azerothcore-worldserver
+    restart: unless-stopped
+    depends_on:
+      ac-db-import:
+        condition: service_completed_successfully
+    environment:
+      - DOCKER_USER=root  # Your permission fix
+      - AC_LOGIN_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_auth
+      - AC_CHARACTER_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_characters
+      - AC_WORLD_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_world
+      - AC_PLAYERBOTS_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_playerbots
+      - AC_REALM_ADDRESS=${AC_REALM_ADDRESS:-10.69.1.176}
+      - AC_MAX_PLAYERBOTS=${AC_MAX_PLAYERBOTS:-500}
+      - AC_MIN_PLAYERBOTS=${AC_MIN_PLAYERBOTS:-400}
+    ports:
+      - "${WORLD_PORT:-8085}:8085"
+    volumes:
+      - acore_etc:/azerothcore/env/dist/etc      # Your named volume fix
+      - acore_logs:/azerothcore/env/dist/logs    # Your named volume fix
+    networks:
+      - acore-network
+
+  ac-authserver:
+    image: acore/ac-wotlk-authserver:master
+    container_name: azerothcore-authserver
+    restart: unless-stopped
+    depends_on:
+      ac-db-import:
+        condition: service_completed_successfully
+    environment:
+      - DOCKER_USER=root  # Your permission fix
+      - AC_LOGIN_DATABASE_INFO=ac-database;3306;root;${MYSQL_ROOT_PASSWORD:-acore123};acore_auth
+    ports:
+      - "${AUTH_PORT:-3724}:3724"
+    volumes:
+      - acore_etc:/azerothcore/env/dist/etc      # Your named volume fix
+      - acore_logs:/azerothcore/env/dist/logs    # Your named volume fix
+    networks:
+      - acore-network
+
+  adminer:
+    image: adminer
+    container_name: azerothcore-adminer
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT:-8056}:8080"
+    networks:
+      - acore-network
+
+volumes:
+  acore_database:  # Your named volumes solution
+  acore_etc:
+  acore_logs:
+
+networks:
+  acore-network:
+    driver: bridge
+

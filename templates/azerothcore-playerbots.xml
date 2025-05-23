@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>AzerothCore-Playerbots</Name>
+  <Repository>yourusername/azerothcore-playerbots</Repository>
+  <Registry>https://hub.docker.com/r/yourusername/</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/yourusername/azerothcore-playerbots-unraid/issues</Support>
+  <Project>https://github.com/coc0nut/AzerothCore-with-Playerbots-Docker-Setup</Project>
+  <Overview>
+    Complete AzerothCore 3.3.5a World of Warcraft: Wrath of the Lich King private server with 400-500 intelligent AI Playerbots.
+    &#xD;
+    &#xD;
+    🎮 **Features:**&#xD;
+    • Full WotLK 3.3.5a server with all content&#xD;
+    • 400-500 AI Playerbots populating the world&#xD;
+    • Complete dungeon and raid support&#xD;
+    • Cross-faction gameplay&#xD;
+    • Built-in MySQL database&#xD;
+    • Web administration via Adminer&#xD;
+    • Optimized for Unraid with all permission fixes&#xD;
+    &#xD;
+    🚀 **Quick Setup:**&#xD;
+    1. Install and wait for database import (5-10 minutes)&#xD;
+    2. Create account: docker exec -it AzerothCore-Playerbots bash -c "cd /azerothcore && echo 'account create admin password123' | ./env/dist/bin/worldserver -c /azerothcore/env/dist/etc/worldserver.conf"&#xD;
+    3. Set GM level: docker exec -it AzerothCore-Playerbots bash -c "cd /azerothcore && echo 'account set gmlevel admin 3 -1' | ./env/dist/bin/worldserver -c /azerothcore/env/dist/etc/worldserver.conf"&#xD;
+    4. Update WoW 3.3.5a client realmlist.wtf to your Unraid IP&#xD;
+    5. Login and enjoy 400-500 AI companions!&#xD;
+    &#xD;
+    Based on proven coc0nut setup with Unraid optimizations.
+  </Overview>
+  <Category>GameServers:</Category>
+  <WebUI>http://[IP]:[PORT:8056]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/yourusername/azerothcore-playerbots-unraid/main/templates/azerothcore-playerbots.xml</TemplateURL>
+  <Icon>https://raw.githubusercontent.com/yourusername/azerothcore-playerbots-unraid/main/images/azerothcore-icon.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <DateInstalled/>
+  <Requires>
+    **System Requirements:**&#xD;
+    • Minimum 4GB RAM (8GB+ recommended)&#xD;
+    • 25GB+ storage space for full installation&#xD;
+    • WoW 3.3.5a client to connect&#xD;
+    • Port 3307 available (MySQL)&#xD;
+    • Ports 3724 and 8085 available (WoW servers)
+  </Requires>
+  
+  <Config Name="WorldServer Port" Target="8085" Default="8085" Mode="tcp" 
+          Description="World of Warcraft game server port - Required for gameplay" 
+          Type="Port" Display="always" Required="true" Mask="false">8085</Config>
+  <Config Name="AuthServer Port" Target="3724" Default="3724" Mode="tcp" 
+          Description="WoW authentication server port - Required for login" 
+          Type="Port" Display="always" Required="true" Mask="false">3724</Config>
+  <Config Name="Database Port" Target="3306" Default="3307" Mode="tcp" 
+          Description="MySQL database port - Uses 3307 to avoid conflicts" 
+          Type="Port" Display="always" Required="true" Mask="false">3307</Config>
+  <Config Name="Adminer Port" Target="8080" Default="8056" Mode="tcp" 
+          Description="Database administration web interface" 
+          Type="Port" Display="always" Required="false" Mask="false">8056</Config>
+  
+  <Config Name="Server Configuration" Target="/azerothcore/env/dist/etc" 
+          Default="/mnt/user/appdata/azerothcore-playerbots/etc" Mode="rw" 
+          Description="Server configuration files and settings" 
+          Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/azerothcore-playerbots/etc</Config>
+  <Config Name="Server Logs" Target="/azerothcore/env/dist/logs" 
+          Default="/mnt/user/appdata/azerothcore-playerbots/logs" Mode="rw" 
+          Description="Server log files for troubleshooting" 
+          Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/azerothcore-playerbots/logs</Config>
+  <Config Name="Database Storage" Target="/var/lib/mysql" 
+          Default="/mnt/user/appdata/azerothcore-playerbots/mysql" Mode="rw" 
+          Description="MySQL database storage - Contains all game data" 
+          Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/azerothcore-playerbots/mysql</Config>
+  
+  <Config Name="MySQL Root Password" Target="MYSQL_ROOT_PASSWORD" Default="acore123" 
+          Description="MySQL database root password for administration" 
+          Type="Variable" Display="always" Required="true" Mask="true">acore123</Config>
+  <Config Name="Server Name" Target="AC_REALM_NAME" Default="AzerothCore" 
+          Description="Realm name displayed in WoW client realm list" 
+          Type="Variable" Display="always" Required="false" Mask="false">AzerothCore</Config>
+  <Config Name="Max Playerbots" Target="AC_MAX_PLAYERBOTS" Default="500" 
+          Description="Maximum number of AI bots (200-800)" 
+          Type="Variable" Display="always" Required="false" Mask="false">500</Config>
+  <Config Name="Min Playerbots" Target="AC_MIN_PLAYERBOTS" Default="400" 
+          Description="Minimum number of AI bots to maintain" 
+          Type="Variable" Display="always" Required="false" Mask="false">400</Config>
+  <Config Name="Server IP" Target="AC_REALM_ADDRESS" Default="10.69.1.176" 
+          Description="Your Unraid server IP address" 
+          Type="Variable" Display="always" Required="false" Mask="false">10.69.1.176</Config>
+  
+  <Config Name="Docker User" Target="DOCKER_USER" Default="root" 
+          Description="Docker user for permission handling - Required for Unraid" 
+          Type="Variable" Display="advanced" Required="false" Mask="false">root</Config>
+  <Config Name="GM Level" Target="AC_GM_LEVEL" Default="3" 
+          Description="GM access level for admin accounts (0=player, 3=full admin)" 
+          Type="Variable" Display="advanced" Required="false" Mask="false">3</Config>
+</Container>
