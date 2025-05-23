@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>AzerothCore-Playerbots</Name>
-  <Repository>yourusername/azerothcore-playerbots</Repository>
-  <Registry>https://hub.docker.com/r/yourusername/</Registry>
+  <Repository>zer0radiance/azerothcore-playerbots</Repository>
+  <Registry>https://hub.docker.com/r/zer0radiance/</Registry>
   <Network>bridge</Network>
   <MyIP/>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Support>https://github.com/yourusername/azerothcore-playerbots-unraid/issues</Support>
+  <Support>https://github.com/zeroradiance/azerothcore-playerbots-unraid/issues</Support>
   <Project>https://github.com/coc0nut/AzerothCore-with-Playerbots-Docker-Setup</Project>
   <Overview>
     Complete AzerothCore 3.3.5a World of Warcraft: Wrath of the Lich King private server with 400-500 intelligent AI Playerbots.
